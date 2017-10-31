@@ -41,7 +41,7 @@
                         <td><input type="reset" value="Reset" /></td>
                     </tr>
                     <tr>
-                        <td colspan="2">Already registered!! <a href="freelancer.jsp">Login Here</a></td>
+                        <td colspan="2">Already registered!! <a href="login.jsp">Login Here</a></td>
                     </tr>
                 </tbody>
             </table>

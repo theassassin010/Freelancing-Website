@@ -3,6 +3,7 @@ package Login;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import DBHandler.dbHandler;
@@ -50,8 +52,8 @@ public class Register extends HttpServlet {
 			String email = request.getParameter("email");
 			boolean status = dbHandler.createFreelancerAccount(password, fName, mName, lName, email);
 			if(status) {
-//				response.setContentType("application/json");
-//			    response.setCharacterEncoding("UTF-8");
+				response.setContentType("application/json");
+			    response.setCharacterEncoding("UTF-8");
 				try{
 					JSONObject obj = new JSONObject();
 					obj = dbHandler.validate(email, password, "freelancer");
@@ -116,6 +118,17 @@ public class Register extends HttpServlet {
 			response.setContentType("application/json");
 		    response.setCharacterEncoding("UTF-8");
 		    request.getRequestDispatcher("RegisterFreelancer.jsp").forward(request, response);
+		}
+		else if(request.getParameter("getTags") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+				JSONArray jsArr = dbHandler.getAllTags();
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+		        rd.include(request,response);
+ 			}
 		}
 	}
 }
