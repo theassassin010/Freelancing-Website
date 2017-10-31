@@ -283,7 +283,7 @@ public class dbHandler {
 			String query =   "select a.taskid, fid, a.comp_ts, status, subject, text "
 							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b" 
 							+"on a.taskid = b.taskid"
-							+"where status = 'working' and fid = '"+fid+"';";
+							+"where status = 'working' and fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
 			ResultSet rs = ps.executeQuery();
@@ -306,7 +306,7 @@ public class dbHandler {
 			String query =   "select a.taskid, fid, a.comp_ts, status, subject, text "
 							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b" 
 							+"on a.taskid = b.taskid"
-							+"where status = 'assigned' and fid = '"+fid+"';";
+							+"where status = 'assigned' and fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
 			ResultSet rs = ps.executeQuery();
@@ -329,7 +329,7 @@ public class dbHandler {
 			String query =   "select a.taskid, fid, a.comp_ts, status, subject, text "
 							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b" 
 							+"on a.taskid = b.taskid"
-							+"where status = 'completed' and fid = '"+fid+"';";
+							+"where status = 'completed' and fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
 			ResultSet rs = ps.executeQuery();
@@ -349,7 +349,7 @@ public class dbHandler {
 		JSONArray jsonArr = new JSONArray();
 		try{
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
-			String query =   "select * from freelancingDB.tag";
+			String query =   "select * from freelancingDB.tag;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ResultSet rs = ps.executeQuery();
 			jsonArr = ResultSetConverter(rs);
@@ -370,8 +370,9 @@ public class dbHandler {
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
 			String query = "select freelancingDB.tag.tagid, freelancingDB.tag.name"
 						  +"from freelancingDB.tag natural join freelancingDB.has_skills"
-						  +"where fid = '"+fid+"';";
+						  +"where fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, fid);
 			ResultSet rs = ps.executeQuery();
 			jsonArr = ResultSetConverter(rs);
 			ps.close();
@@ -389,24 +390,25 @@ public class dbHandler {
 		boolean status = false;
 		try{
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
-			String query = "delete "
-							+"from freelancingDB.has_skills where"
-							+"fid = '"+fid+"';";
+			String query = "delete from freelancingDB.has_skills where fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, fid);
 			ps.executeUpdate();
-			ResultSet rs = ps.executeQuery();
+//			System.out.println(tags);
 			for(int i=0; i<tags.length(); i++){
 				query = "insert into freelancingDB.has_skills values(?, ?);";
+				ps = conn.prepareStatement(query);
 				JSONObject obj = tags.getJSONObject(i);
 				ps.setString(1, fid);
-				ps.setString(2, obj.getString("tagid"));
+				String tagid = obj.getString("tagid");
+				ps.setString(2, tagid);
 				ps.executeUpdate();
 			}
 			ps.close();
 			conn.close();
 		}
 		catch(Exception e){
-			System.out.println("Error while assigning Project");
+			System.out.println("Error while assigning skills to Freelancers");
 			System.out.println(e);
 		}
 		return status;

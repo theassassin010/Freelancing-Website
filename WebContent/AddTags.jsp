@@ -25,8 +25,8 @@
 						output += "<form action=\"Register\" method=\"post\">";
 				   		for(i=0; i<json_obj.length; i++){
 							var tag = json_obj[i];
-							output +="<input type=\"checkbox\" name=\""+json_obj[i].tagid+
-									 "\" value=\""+json_obj[i].name+"\">"+json_obj[i].name+"<br>";
+							output +="<input type=\"checkbox\" name=\"checkedTags\" "
+									 +"value=\""+json_obj[i].tagid+"\">"+json_obj[i].name+"<br>";
 			    	  	}
 				   		output += "<input type = \"submit\" value = \"Submit\" name = \"updateFreelancerTags\">"+"</form>";
 				   		console.log(output);

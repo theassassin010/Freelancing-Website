@@ -130,5 +130,30 @@ public class Register extends HttpServlet {
 		        rd.include(request,response);
  			}
 		}
+		else if(request.getParameter("updateFreelancerTags") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String[] values = request.getParameterValues("checkedTags");
+ 				try{
+	 				JSONArray tags = new JSONArray();
+	 				for (String value : values) {
+	 					JSONObject json = new JSONObject();
+	 					json.put("tagid", value);
+	 					tags.put(json);
+	 				}
+	 				dbHandler.updateFreelancerTags((String) session.getAttribute("uid"), tags);
+	 				
+	//				JSONArray jsArr = dbHandler.getAllTags();
+	//				response.getWriter().write(jsArr.toString());
+ 				}
+				catch (Exception e){
+					System.out.println(e);
+				}
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+		        rd.include(request,response);
+ 			}
+		}
 	}
 }
