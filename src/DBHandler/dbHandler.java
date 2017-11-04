@@ -202,26 +202,25 @@ public class dbHandler {
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
 			String query = "with taskids as ("
 								+"(select taskid from freelancingDB.tasks)"
-								+	"EXCEPT"
+								+	" EXCEPT "
 								+"(select taskid from freelancingDB.assigned_tasks)"
 							+"),"
-							+"info as("
+							+"info as ("
 								+"select *" 
-								+"from freelancingDB.tasks natural join freelancingDB.has_tags" 
+								+"from freelancingDB.tasks natural join freelancingDB.has_tags " 
 								+"where tagid in ("
-									+"select tagid" 
-									+"from freelancingDB.has_skills" 
+									+"select tagid " 
+									+"from freelancingDB.has_skills " 
 									+"where fid = ?"
 								+")"
-							+")"
-							+"select * from taskids natural join info;";
+							+") "
+							+"select * from taskids natural join info order by post_ts;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
 			ResultSet rs = ps.executeQuery();
 			jsonArr = ResultSetConverter(rs);
 			ps.close();
 			conn.close();
-			return jsonArr;
 		}
 		catch(Exception e){
 			System.out.println("Error while assigning Project");
@@ -412,6 +411,67 @@ public class dbHandler {
 			System.out.println(e);
 		}
 		return status;
+	}
+	
+	public static boolean insertPostTags(String uid, JSONArray tags){
+		boolean status = false;
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			
+			for(int i=0; i<tags.length(); i++){
+				String query = "insert into freelancingDB.has_tags values(?, ?);";
+				PreparedStatement ps = conn.prepareStatement(query);
+				JSONObject obj = tags.getJSONObject(i);
+				ps.setString(1, uid);
+				String tagid = obj.getString("tagid");
+				ps.setString(2, tagid);
+				ps.executeUpdate();
+				ps.close();
+			}
+			conn.close();
+		}
+		catch(Exception e){
+			System.out.println("Error while assigning tags to the Task");
+			System.out.println(e);
+		}
+		return status;
+	}
+	
+	public static JSONArray getBidsOnUnassignedTasks(String uid){
+		JSONArray jsonArr = new JSONArray();
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "with tmp as ("
+										+ "select fid, taskid, comp_ts, fName, amount, rating "
+										+"from freelancingDB.bid natural join freelancingDB.freelancer " 
+										+"where taskid in ("
+						 				+	"("
+						 				+ 	"select taskid "
+										+		"from freelancingDB.tasks "
+										+	"where uid = ?"
+						 				+	")"
+										+" except "
+										+	"("
+										+ 	"select taskid "
+										+		"from freelancingDB.assigned_tasks"
+						 				+	")"
+										+"))"
+							+" select fid, tmp.taskid, subject, text, t.post_ts, tmp.comp_ts, fName, amount, rating "
+							+"from tmp join freelancingDB.tasks as t on tmp.taskid = t.taskid order by taskid "
+							+";";
+//			String query = "select * from freelancingDB.user where uid = ?";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, uid);
+			ResultSet rs = ps.executeQuery();
+			jsonArr =  ResultSetConverter(rs);
+			ps.close();
+			conn.close();
+		}
+		catch(Exception e){
+			System.out.println("Error while getting bids");
+			System.out.println(e);
+		}
+		return jsonArr;
 	}
 	
 	private static JSONArray ResultSetConverter(ResultSet rs) throws SQLException, JSONException {
