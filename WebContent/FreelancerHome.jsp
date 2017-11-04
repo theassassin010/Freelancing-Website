@@ -43,10 +43,53 @@
 		</script>
 		
 		<script>
+			function getPendingProjects(){
+				$.ajax({
+					url : "HomeRelated",
+				    dataType : 'html',
+					type: "POST",
+					data: {
+						getPendingProjects: "getPendingProjects"
+					},
+				    success : function(result) {
+				    	var json_obj = $.parseJSON(result);
+				    	var output = "";
+				   		for(i=0; i<json_obj.length; i++){
+				   			var json = json_obj[i];
+				   			output += json.subject;
+				   			output += "&nbsp;&nbsp;&nbsp;&nbsp;";
+				   			output += json.comp_ts;
+				   			output += "&nbsp;&nbsp;&nbsp;&nbsp;";
+				   			output += "<form action=\"HomeRelated\" method=\"post\">";
+				   			output += "<input type = \"submit\" value = \"Mark as Completed\" name = \""+json.taskid+"\">";
+				   			output += "</form> <br>";
+					   		console.log(output);
+				    	}
+				   		console.log(output);
+						$("#pendingTasks").html(output);
+					},
+				    error : function() {
+				    	alert("Error Occured");
+				    },
+				});	
+			}
+		</script>
+		
+		
+		<script>
 			getInterestingProjects();
 		</script>
+		
+		<script>
+			getPendingProjects();
+		</script>
+		
 	</head>
 	<body>
+		<h1>Interesting Projects</h1>
 		<div id="home"></div>
+		====================================================================================================
+		<h2>Pending Projects</h2>
+		<div id="pendingTasks"></div>
 	</body>
 </html>

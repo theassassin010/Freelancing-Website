@@ -54,6 +54,18 @@ public class HomeRelated extends HttpServlet {
 		        rd.include(request,response);
  			}
 		}
+		else if(request.getParameter("getPendingProjects") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getPendingProjects(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+		        rd.include(request,response);
+ 			}
+		}
 	}
 
 }

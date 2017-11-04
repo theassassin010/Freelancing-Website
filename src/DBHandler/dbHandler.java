@@ -269,7 +269,7 @@ public class dbHandler {
 			return jsonArr;
 		}
 		catch(Exception e){
-			System.out.println("Error while assigning Project");
+			System.out.println("Error while getting projects by Tag");
 			System.out.println(e);
 		}
 		return jsonArr;
@@ -280,8 +280,8 @@ public class dbHandler {
 		try{
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
 			String query =   "select a.taskid, fid, a.comp_ts, status, subject, text "
-							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b" 
-							+"on a.taskid = b.taskid"
+							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b " 
+							+"on a.taskid = b.taskid "
 							+"where status = 'working' and fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
