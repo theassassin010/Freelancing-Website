@@ -325,9 +325,8 @@ public class dbHandler {
 		JSONArray jsonArr = new JSONArray();
 		try{
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
-			String query =   "select a.taskid, fid, a.comp_ts, status, subject, text "
-							+"from freelancingDB.assigned_tasks a join freelancingDB.tasks b" 
-							+"on a.taskid = b.taskid"
+			String query =   "select b.taskid, c.comp_ts, amount, subject " 
+							+"from freelancingDB.bid c natural join freelancingDB.assigned_tasks a join freelancingDB.tasks b on a.taskid = b.taskid "
 							+"where status = 'completed' and fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
@@ -338,10 +337,55 @@ public class dbHandler {
 			return jsonArr;
 		}
 		catch(Exception e){
-			System.out.println("Error while Assigning Project");
+			System.out.println("Error while Getting Completed Projects");
 			System.out.println(e);
 		}
 		return jsonArr;
+	}
+	
+	public static JSONArray getOngoingBids(String fid){
+		JSONArray jsonArr = new JSONArray();
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select subject, a.taskid, amount, b.comp_ts "
+							+"from freelancingDB.tasks a join freelancingDB.bid b on a.taskid = b.taskid "
+							+"where fid = ? and a.taskid in "
+							+"("
+							+ 	"(select taskid "
+							+	"from freelancingDB.bid) "
+							+	"except "
+							+	"(select taskid "
+							+	"from freelancingDB.assigned_tasks) "
+							+");";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, fid);
+			ResultSet rs = ps.executeQuery();
+			jsonArr = ResultSetConverter(rs);
+			ps.close();
+			conn.close();
+			return jsonArr;
+		}
+		catch(Exception e){
+			System.out.println("Error while assigning Project");
+			System.out.println(e);
+		}
+		return jsonArr;
+	}
+
+	public static void deleteBid(String fid, String taskid){
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "delete from freelancingDB.bid where fid = ? and taskid = ?;";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, fid);
+			ps.setString(2, taskid);
+			ps.executeUpdate();
+			ps.close();
+			conn.close();			 
+		} 
+		catch(Exception e){
+			System.out.println(e);
+		}
 	}
 	
 	public static JSONArray getAllTags(){

@@ -78,7 +78,7 @@ public class Login extends HttpServlet {
 		        rd.include(request,response);  
 		    }
 	    }
-	    catch (JSONException e) {
+	    catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error in doPost of Login");
 			e.printStackTrace();

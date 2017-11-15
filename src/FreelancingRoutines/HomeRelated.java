@@ -50,7 +50,7 @@ public class HomeRelated extends HttpServlet {
 				response.getWriter().write(jsArr.toString());
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}
@@ -62,7 +62,67 @@ public class HomeRelated extends HttpServlet {
 				response.getWriter().write(jsArr.toString());
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getCompletedProjects") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getCompletedProjects(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getOngoingBids") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getOngoingBids(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("deleteBid") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+ 				String taskid = request.getParameter("taskid");
+ 				dbHandler.deleteBid(uid, taskid);
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getAllTags") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+ 				JSONArray jsArr = dbHandler.getAllTags();
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getFreelancerTags") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getFreelancerTags(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}
