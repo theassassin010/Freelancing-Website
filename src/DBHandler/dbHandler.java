@@ -589,6 +589,30 @@ public class dbHandler {
 		return jsonArr;
 	}
 	
+	public static JSONArray getBidSummary(String uid){
+		JSONArray jsonArr = new JSONArray();
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = ""
+					+ "select a.taskid, subject, post_ts, count(b.fid) as bidCount "
+					+ "from freelancingDB.tasks a join freelancingDB.bid b on a.taskid = b.taskid "
+					+ "where a.uid = ? "
+					+ "group by (a.taskid, subject, post_ts) "
+					+ "order by post_ts;";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, uid);
+			ResultSet rs = ps.executeQuery();
+			jsonArr =  ResultSetConverter(rs);
+			ps.close();
+			conn.close();
+		}
+		catch(Exception e){
+			System.out.println("Error while getting bids");
+			System.out.println(e);
+		}
+		return jsonArr;
+	}
+	
 	private static JSONArray ResultSetConverter(ResultSet rs) throws SQLException, JSONException {
 		// TODO Auto-generated method stub
 		JSONArray json = new JSONArray();

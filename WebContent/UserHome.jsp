@@ -20,7 +20,80 @@
 			    background-color: #dddddd;
 			}
 		</style>
-	
+<style type="text/css"> 
+			body {
+		background-color: #f4f4f4;
+		color: #5a5656;
+		font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+		font-size: 14px;
+		line-height: 1.5em;
+		}
+		a { text-decoration: none; }
+		h1 { font-size: 1em; }
+		h1, p {
+		margin-bottom: 10px;
+		}
+		strong {
+		font-weight: bold;
+		}
+		.topnav {
+		background-color: #333;
+		overflow: hidden;
+		}	
+		.topnav a {
+			float: left;
+			display: block;
+			color: #f2f2f2;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+			font-size: 17px;
+		}
+		.topnav a:hover {
+			background-color: #ddd;
+			color: black;
+		}
+		.topnav a.active {
+			background-color: #4CAF50;
+			color: white;
+		}
+		.topnav .icon {
+		  display: none;
+		}
+		@media screen and (max-width: 600px) {
+		  .topnav a:not(:first-child) {display: none;}
+		  .topnav a.icon {
+			float: right;
+			display: block;
+		  }
+		}
+
+		@media screen and (max-width: 600px) {
+		  .topnav.responsive {position: relative;}
+		  .topnav.responsive .icon {
+			position: absolute;
+			right: 0;
+			top: 0;
+		  }
+		  .topnav.responsive a {
+			float: none;
+			display: block;
+			text-align: left;
+		  }
+		
+		</style>
+
+		<script>
+		function myFunction() {
+			var x = document.getElementById("myTopnav");
+			if (x.className === "topnav") {
+				x.className += " responsive";
+			} else {
+				x.className = "topnav";
+			}
+		}
+		</script>
+		
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Welcome Page</title>
 		
@@ -29,41 +102,34 @@
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 		
 		<script>
-			function getBids(){
+			function getBidSummary(){
 				$.ajax({
 					url : "BidRelated",
 				    dataType : 'html',
 					type: "POST",
 					data: {
-						getBidsOnUnassignedTasks: "getBidsOnUnassignedTasks"
+						getBidSummary: "getBidSummary"
 					},
 				    success : function(result) {
+				    	document.title = "Bid Results";
 				    	var json_obj = $.parseJSON(result);
-				   		console.log(output);
+				    	var output = "<h1><strong> Look at the bid of your posted Projects: </strong></h1> <br>";
+				    	output += "<table><tr><th>Subject</th><th>Posted On</th><th>No of Applicants</th><th>Details</th></tr>";
 				   		for(i=0; i<json_obj.length; i++){
 							var bid = json_obj[i];
-							var output = bid.subject;
-							output += "&nbsp; &nbsp; Posted on: "
-							output += bid.post_ts;
-							output += "<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bid.fname+"&nbsp;&nbsp;&nbsp;&nbsp";
-							date = bid.comp_ts.split();
-							output += "&nbsp;&nbsp;&nbsp;&nbsp"+bid.amount+"&nbsp;&nbsp;&nbsp;&nbsp"+bid.rating; 
-							date += bid.comp_ts;
-/*							while(bid.subject == json_obj[i].subject){
-								
-							}
-							output +="<tr>"
-								    +"<th>"+bid.subject+"</th>"
-								    +"<th>"+bid.comp_ts+"</th>"
-								    +"<th>"+bid.amount+"</th>"
-								    +"<th>"+bid.fname+"</th>"
-								    +"<th>"+bid.rating+"</th>"
-								  	+"</tr>";
-			    	  	}
-						output += "</table>";*/
-				    	}
-				   		console.log(output);
-						$("#bidInfo").html(output);
+				   			output += "<tr><td>";
+					   		output += bid.subject;
+				   			output += "</td><td>";
+				   			output += bid.post_ts;
+				   			output += "</td><td>";
+				   			output += bid.post_ts;
+				   			output += "</td><td>";
+				   			output += "<button type=\"button\" onclick=\"getAllBidsOnTask("+bid.taskid+")\" >Details</button>";
+							output += "</td></tr>";
+				   			console.log(output);
+				   		}
+				   		output += "</table>";
+				   		$("#content").html(output);
 					},
 				    error : function() {
 				    	alert("Error Occured");
@@ -73,11 +139,21 @@
 		</script>
 		
 		<script>
-			getBids();
+			getBidSummary();
 		</script>
 		
 	</head>
 	<body>
-		<div id="bidInfo"></div>
+		<div class="topnav" id="myTopnav">
+		  <a href="#home">Home</a>
+		  <a href="#postTask">Post Task</a>
+		  <a href="#contact">Contact</a>
+		  <a href="#logout">Logout</a>
+		  <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
+		</div>
+		
+		<center>
+		<div id="content"></div>
+		</center>
 	</body>
 </html>

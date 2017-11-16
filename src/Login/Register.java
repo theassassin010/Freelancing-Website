@@ -142,8 +142,8 @@ public class Register extends HttpServlet {
 	 					tags.put(json);
 	 				}
 	 				dbHandler.updateFreelancerTags((String) session.getAttribute("uid"), tags);
-					JSONArray jsArr = dbHandler.getAllTags();
-					response.getWriter().write(jsArr.toString());
+	 				RequestDispatcher rd = request.getRequestDispatcher("FreelancerHome.jsp");  
+			        rd.include(request,response);
  				}
 				catch (Exception e){
 					System.out.println(e);

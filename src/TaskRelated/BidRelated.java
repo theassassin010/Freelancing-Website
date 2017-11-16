@@ -119,5 +119,17 @@ public class BidRelated extends HttpServlet {
 		        rd.include(request,response);
  			}
 		}
+		else if(request.getParameter("getBidSummary") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getBidSummary(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+		        rd.include(request,response);
+ 			}
+		}
 	}
 }
