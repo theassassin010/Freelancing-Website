@@ -214,9 +214,14 @@ public class dbHandler {
 									+"where fid = ?"
 								+")"
 							+") "
-							+"select * from taskids natural join info order by post_ts;";
+							+"select * from taskids natural join info "
+							+ "where taskids.taskid not in ( "
+							+	"select taskid from freelancingDB.bid where fid = ? "
+							+ ") "
+							+ "order by post_ts;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
+			ps.setString(2, fid);
 			ResultSet rs = ps.executeQuery();
 			jsonArr = ResultSetConverter(rs);
 			ps.close();
@@ -321,6 +326,23 @@ public class dbHandler {
 		return jsonArr;
 	}
 	
+	public static void markAsCompleted(String fid, String taskid){
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "update freelancingDB.assigned_tasks set status = 'completed' where taskid = ? and fid = ?;";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, taskid);
+			ps.setString(2, fid);
+			ps.executeUpdate();
+			ps.close();
+			conn.close();
+		}
+		catch(Exception e){
+			System.out.println("Error while marking as Completed");
+			System.out.println(e);
+		}
+	}
+	
 	public static JSONArray getCompletedProjects(String fid){
 		JSONArray jsonArr = new JSONArray();
 		try{
@@ -401,7 +423,7 @@ public class dbHandler {
 			return jsonArr;
 		}
 		catch(Exception e){
-			System.out.println("Error while getting Tags");
+			System.out.println("Error while getting All Tags");
 			System.out.println(e);
 		}
 		return jsonArr;
@@ -411,8 +433,8 @@ public class dbHandler {
 		JSONArray jsonArr = new JSONArray();
 		try{
 			Connection conn = DriverManager.getConnection(connString, userName, passWord);
-			String query = "select freelancingDB.tag.tagid, freelancingDB.tag.name"
-						  +"from freelancingDB.tag natural join freelancingDB.has_skills"
+			String query = "select freelancingDB.tag.tagid, freelancingDB.tag.name "
+						  +"from freelancingDB.tag natural join freelancingDB.has_skills "
 						  +"where fid = ?;";
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, fid);
@@ -427,6 +449,55 @@ public class dbHandler {
 			System.out.println(e);
 		}
 		return jsonArr;
+	}
+	
+	public static JSONArray getTaskTags(String taskid){
+		JSONArray jsonArr = new JSONArray();
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select freelancingDB.tag.tagid, freelancingDB.tag.name "
+						  +"from freelancingDB.tag natural join freelancingDB.has_tags "
+						  +"where taskid = ?;";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, taskid);
+			ResultSet rs = ps.executeQuery();
+			jsonArr = ResultSetConverter(rs);
+			ps.close();
+			conn.close();
+			return jsonArr;
+		}
+		catch(Exception e){
+			System.out.println("Error while getting Freelancer Tags");
+			System.out.println(e);
+		}
+		return jsonArr;
+	}
+	
+	public static JSONObject getTaskInfo(String taskid){
+		JSONObject jsonobj = new JSONObject();
+		try{
+			Connection conn = DriverManager.getConnection(connString, userName, passWord);
+			String query = "select subject, text, comp_ts, min_pay, max_pay "
+						  +"from freelancingDB.tasks "
+						  +"where taskid = ?;";
+			PreparedStatement ps = conn.prepareStatement(query);
+			ps.setString(1, taskid);
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			jsonobj.put("subject", rs.getString(1));
+			jsonobj.put("text", rs.getString(2));
+			jsonobj.put("comp_ts", rs.getString(3));
+			jsonobj.put("min_pay", rs.getString(4));
+			jsonobj.put("max_pay", rs.getString(5));
+			ps.close();
+			conn.close();
+			return jsonobj;
+		}
+		catch(Exception e){
+			System.out.println("Error while getting Task Tags");
+			System.out.println(e);
+		}
+		return jsonobj;
 	}
 	
 	public static boolean updateFreelancerTags(String fid, JSONArray tags){

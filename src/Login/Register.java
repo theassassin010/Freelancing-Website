@@ -126,7 +126,7 @@ public class Register extends HttpServlet {
 				response.getWriter().write(jsArr.toString());
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}
@@ -142,16 +142,15 @@ public class Register extends HttpServlet {
 	 					tags.put(json);
 	 				}
 	 				dbHandler.updateFreelancerTags((String) session.getAttribute("uid"), tags);
-	 				
-	//				JSONArray jsArr = dbHandler.getAllTags();
-	//				response.getWriter().write(jsArr.toString());
+					JSONArray jsArr = dbHandler.getAllTags();
+					response.getWriter().write(jsArr.toString());
  				}
 				catch (Exception e){
 					System.out.println(e);
 				}
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}

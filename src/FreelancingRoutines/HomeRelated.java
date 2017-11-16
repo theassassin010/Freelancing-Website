@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import DBHandler.dbHandler;
 
@@ -60,6 +61,18 @@ public class HomeRelated extends HttpServlet {
  				String uid = (String) session.getAttribute("uid");
 				JSONArray jsArr = dbHandler.getPendingProjects(uid);
 				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("markAsCompleted") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+ 				String taskid = request.getParameter("taskid");
+ 				dbHandler.markAsCompleted(uid, taskid);
  			}
  			else{
  				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
@@ -120,6 +133,30 @@ public class HomeRelated extends HttpServlet {
 				String uid = (String) session.getAttribute("uid");
 				JSONArray jsArr = dbHandler.getFreelancerTags(uid);
 				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("updateFreelancerTags") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String[] values = request.getParameterValues("checkedTags");
+ 				try{
+	 				JSONArray tags = new JSONArray();
+	 				for (String value : values) {
+	 					JSONObject json = new JSONObject();
+	 					json.put("tagid", value);
+	 					tags.put(json);
+	 				}
+	 				dbHandler.updateFreelancerTags((String) session.getAttribute("uid"), tags);
+	 				RequestDispatcher rd = request.getRequestDispatcher("FreelancerHome.jsp");  
+			        rd.include(request,response);
+ 				}
+				catch (Exception e){
+					System.out.println(e);
+				}
  			}
  			else{
  				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  

@@ -118,6 +118,7 @@
 						getInterestingProjects: "getInterestingProjects"
 					},
 				    success : function(result) {
+				    	document.title = "Welcome, Bid on some projects";
 				    	var json_obj = $.parseJSON(result);
 				    	var output = "<h1><strong> Bid on projects that you might like: </strong></h1> <br>";
 				    	output += "<table> <tr> <th>Subject</th> <th>Completion Time</th> <th>Bid</th> </tr>";
@@ -129,7 +130,8 @@
 				   			output += json.comp_ts;
 				   			output += "</td><td>";
 				   			output += "<form action=\"BidRelated\" method=\"post\">";
-				   			output += "<input type = \"submit\" value = \"Bid\" name = \""+json.taskid+"\">";
+				   			output += "<input type = \"submit\" value = \"Bid\" name=\"Bid\">";
+				   			output += "<input type=\"hidden\" value=\""+json.taskid+"\" name=\"taskid\" />";
 				   			output += "</form> </td></tr>";
 					   		console.log(output);
 				    	}
@@ -154,9 +156,10 @@
 						getPendingProjects: "getPendingProjects"
 					},
 				    success : function(result) {
+				    	document.title = "Your Ongoing Projects";
 				    	var json_obj = $.parseJSON(result);
 				    	var output = "<h1><strong> Here are your ongoing tasks: </strong></h1> <br>";
-				    	output += "<table> <tr> <th>Subject</th> <th>Proposed Completion Time</th> <th>Status</th> </tr>";
+				    	output += "<table id=\"pendingProjectsTable\"> <tr> <th>Subject</th> <th>Proposed Completion Time</th> <th>Status</th> </tr>";
 				   		for(i=0; i<json_obj.length; i++){
 				   			var json = json_obj[i];
 				   			output += "<tr><td>";
@@ -164,9 +167,9 @@
 				   			output += "</td><td>";
 				   			output += json.comp_ts;
 				   			output += "</td><td>";
-				   			output += "<form action=\"HomeRelated\" method=\"post\">";
-				   			output += "<input type = \"submit\" value = \"Mark as Completed\" name = \""+json.taskid+"\">";
-				   			output += "</form> <br>";
+				   			output += "<button type = \"button\" id = \"completed_"+json.taskid+"\""
+				   			output += " onclick=\"if (confirm('Is "+json.subject+" really completed?')){markAsCompleted(this, '"+json.taskid+"')}\">Mark as Completed</button></th>"
+				   			output += "</td></tr>"
 					   		console.log(output);
 				    	}
 				   		output += "</table>";
@@ -181,6 +184,29 @@
 		</script>
 		
 		<script>
+			function markAsCompleted(r, taskid) {
+				$(document).ready(function(){
+				    var i = r.parentNode.parentNode.rowIndex;
+				    $.ajax({
+						url : "HomeRelated",
+					    dataType : 'html',
+						type: "POST",
+						data: {
+							markAsCompleted: "markAsCompleted",
+							taskid: taskid
+						},
+					    error : function() {
+					    	alert("Error Occured");
+					    },
+					    success : function(data) {
+						    document.getElementById("pendingProjectsTable").deleteRow(i);
+						}
+					});
+				});
+			}
+		</script>
+		
+		<script>
 			function getCompletedProjects(){
 				$.ajax({
 					url : "HomeRelated",
@@ -190,6 +216,7 @@
 						getCompletedProjects: "getCompletedProjects"
 					},
 				    success : function(result) {
+				    	document.title = "Your Completed Projects";
 				    	var json_obj = $.parseJSON(result);
 				    	var output = "<h1><strong> Your previously completed projects: </strong></h1> <br>";
 				    	output += "<table> <tr> <th>Subject</th> <th>Completion Time</th> <th>Payment</th> </tr>";
@@ -225,6 +252,7 @@
 						getOngoingBids: "getOngoingBids"
 					},
 				    success : function(result) {
+				    	document.title = "Your Ongoing Bids";
 				    	var json_obj = $.parseJSON(result);
 				    	var output = "<h1><strong> Check your results: </strong></h1> <br>";
 				    	output += "<table id=\"ongoingBidTable\"> <tr> <th>Subject</th> <th>Quoted Completion Time</th> <th>Bidding Amount</th> <th>Remove Bid</th> </tr>";
@@ -286,41 +314,46 @@
 						getTags: "getTags"
 					},
 				    success : function(result) {
-				    	var json_obj = $.parseJSON(result);
-				    	var tag = getFreelancerTags();
-				   		var output = "<h1><strong> Update your skills.</strong></h1>";
-						output += "<form action=\"Register\" method=\"post\">";
-				   		for(i=0; i<json_obj.length; i++){
-							var tag = json_obj[i];
-							output +="<input type=\"checkbox\" name=\"checkedTags\ " 
-//towork here>>									 +"onload"
-									 +"value=\""+json_obj[i].tagid+"\" >"+json_obj[i].name+"<br>";
-			    	  	}
-				   		output += "<input type = \"submit\" value = \"Submit\" name = \"updateFreelancerTags\">"+"</form>";
-				   		console.log(output);
-						$("#home").html(output);
-					},
-				    error : function() {
-				    	alert("Error Occured");
-				    },
-				});	
-			}
-		</script>
-		
-		
-		
-		<script>
-			function getFreelancerTags(){
-				$.ajax({
-					url : "HomeRelated",
-				    dataType : 'html',
-					type: "POST",
-					data: {
-						getFreelancerTags: "getFreelancerTags"
-					},
-				    success : function(result) {
-				    	var json_obj = $.parseJSON(result);
-				    	return json_obj;
+				    	var allTags = $.parseJSON(result);
+				    	$.ajax({
+							url : "HomeRelated",
+						    dataType : 'html',
+							type: "POST",
+							data: {
+								getFreelancerTags: "getFreelancerTags"
+							},
+						    success : function(result) {
+						    	document.title = "Update Skills";
+						    	var freelancerTags = $.parseJSON(result);
+						   		var output = "<h1><strong> Update your skills.</strong></h1>";
+								output += "<form action=\"HomeRelated\" method=\"post\">";
+								for(i=0; i<allTags.length; i++){
+									var tag = allTags[i];
+									var isFreelancerTag	= false;
+									for(j=0; j<freelancerTags.length; j++){
+										if(allTags[i].tagid == freelancerTags[j].tagid) {
+											isFreelancerTag = true;
+											break;
+										}
+									}
+									if(isFreelancerTag){
+										output +="<input type=\"checkbox\" name=\"checkedTags\" checked "
+											 +"value=\""+allTags[i].tagid+"\" >"+allTags[i].name+"<br>";
+									}
+									else{
+										output +="<input type=\"checkbox\" name=\"checkedTags\" "
+											 +"value=\""+allTags[i].tagid+"\" >"+allTags[i].name+"<br>";
+									}
+					    	  	}
+						   		output += "<input type = \"submit\" value = \"Submit\" name = \"updateFreelancerTags\">"+"</form>";
+						   		console.log(output);
+								$("#home").html(output);
+							},
+						    error : function() {
+						    	alert("Error Occured");
+						    },
+						});
+				   		
 					},
 				    error : function() {
 				    	alert("Error Occured");
