@@ -182,6 +182,25 @@
 		</script>
 		
 		<script>
+			function logout(){
+				$.ajax({
+					url : "HomeRelated",
+				    dataType : 'html',
+					type: "POST",
+					data: {
+						logout: "logout"
+					},
+				    success : function(result) {
+				    	window.location='login.jsp';
+					},
+				    error : function() {
+				    	alert("Error Occured");
+				    },
+				});
+			}
+		</script>
+		
+		<script>
 			getBidSummary();
 		</script>
 		
@@ -191,7 +210,7 @@
 		  <a href="#home" onclick="getBidSummary()">Home</a>
 		  <a href="#postTask" onclick="document.location.href='PostTask.jsp';">Post Task</a>
 		  <a href="#ongoingTasks" onclick="getOngoingProjects()">Ongoing Tasks</a>
-		  <a href="#logout">Logout</a>
+		  <a href="#logout" onclick="logout()">Logout</a>
 		  <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
 		</div>
 		

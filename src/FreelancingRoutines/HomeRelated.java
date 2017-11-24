@@ -1,6 +1,7 @@
 package FreelancingRoutines;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -198,6 +199,22 @@ public class HomeRelated extends HttpServlet {
  				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
+		}
+		else if(request.getParameter("logout") != null){
+			response.setContentType("text/html");  
+	        PrintWriter out=response.getWriter();
+	    	try{ 
+	        	HttpSession session=request.getSession();
+		        session.invalidate(); 
+		        out.println("Login Again"); 
+		    	RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);  
+	        }
+	        catch(Exception e){
+		    	RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);  
+	        }
+	        out.close();    	
 		}
 	}
 

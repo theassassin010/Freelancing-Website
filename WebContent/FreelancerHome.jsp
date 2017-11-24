@@ -423,6 +423,25 @@
 		</script>
 		
 		<script>
+			function logout(){
+				$.ajax({
+					url : "HomeRelated",
+				    dataType : 'html',
+					type: "POST",
+					data: {
+						logout: "logout"
+					},
+				    success : function(result) {
+				    	window.location='login.jsp';
+					},
+				    error : function() {
+				    	alert("Error Occured");
+				    },
+				});
+			}
+		</script>
+		
+		<script>
 			getInterestingProjects();
 		</script>
 		
@@ -435,7 +454,7 @@
 		  <a href="#completedTasks" onclick="getCompletedProjects()">Completed Tasks</a>
 		  <a href="#ongoingBids" onclick="getOngoingBids()">Ongoing Bids</a>
 		  <a href="#updateSkills" onclick="updateSkills()">Update Skills</a>
-		  <a href="#logout">Logout</a>
+		  <a href="#logout" onclick="logout()">Logout</a>
 		  <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
 		</div>
 		<div id="home"></div>
