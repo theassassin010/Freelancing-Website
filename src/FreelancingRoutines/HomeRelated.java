@@ -163,6 +163,42 @@ public class HomeRelated extends HttpServlet {
 		        rd.include(request,response);
  			}
 		}
+		else if(request.getParameter("getOngoingProjects") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getOngoingProjects(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getNewlyAssignedProjects") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+				JSONArray jsArr = dbHandler.getNewlyAssignedProjects(uid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("markAsWorking") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String uid = (String) session.getAttribute("uid");
+ 				String taskid = request.getParameter("taskid");
+ 				dbHandler.markAsWorking(uid, taskid);
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
+		        rd.include(request,response);
+ 			}
+		}
 	}
 
 }

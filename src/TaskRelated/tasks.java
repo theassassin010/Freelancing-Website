@@ -53,7 +53,7 @@ public class tasks extends HttpServlet {
 				response.getWriter().write(jsArr.toString());
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}
@@ -68,6 +68,7 @@ public class tasks extends HttpServlet {
 	 					json.put("tagid", value);
 	 					tags.put(json);
 	 				}
+	 				String uid = (String) session.getAttribute("uid");
 	 				String subject = request.getParameter("subject");
 	 				String text = request.getParameter("text");
 	 				String compDate = request.getParameter("comp_ts");
@@ -78,15 +79,19 @@ public class tasks extends HttpServlet {
 	 				java.sql.Timestamp sq = new java.sql.Timestamp(utilDate.getTime());  
 	 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 				java.sql.Timestamp ts = java.sql.Timestamp.valueOf(sdf.format(sq));
-	 				dbHandler.postProject((String) session.getAttribute("uid"), subject, text, ts, minPay, maxPay);
-	 				dbHandler.insertPostTags((String) session.getAttribute("uid"), tags);
+	 				dbHandler.postProject(uid, subject, text, ts, minPay, maxPay);
+	 				JSONObject json = dbHandler.getTaskID(uid, subject, text);
+	 				String taskid = json.getString("taskid");
+	 				dbHandler.insertPostTags(taskid, tags);
+	 				RequestDispatcher rd = request.getRequestDispatcher("UserHome.jsp");  
+			        rd.include(request,response);
 	 			}
 				catch (Exception e){
 					System.out.println(e);
 				}
  			}
  			else{
- 				RequestDispatcher rd = request.getRequestDispatcher("login.html");  
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");  
 		        rd.include(request,response);
  			}
 		}

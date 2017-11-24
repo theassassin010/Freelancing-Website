@@ -131,5 +131,58 @@ public class BidRelated extends HttpServlet {
 		        rd.include(request,response);
  			}
 		}
+		else if(request.getParameter("getBidDetails") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String taskid = request.getParameter("taskid");
+				JSONArray jsArr = dbHandler.getBidDetails(taskid);
+				response.getWriter().write(jsArr.toString());
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("getAllBidsOnTask") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				String taskid = request.getParameter("taskid");
+ 				String subject = request.getParameter("subject");
+ 				String text = request.getParameter("text");
+ 				String post_ts = request.getParameter("post_ts");
+ 				session.setAttribute("taskid", taskid);
+ 				RequestDispatcher rd = request.getRequestDispatcher("viewBids.jsp");
+		        rd.include(request,response);
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+		        rd.include(request,response);
+ 			}
+		}
+		else if(request.getParameter("assignProject") != null){
+			HttpSession session = request.getSession(false);
+ 			if(session != null){
+ 				try{
+	 				String taskid = request.getParameter("taskid");
+	 				String comp_ts = request.getParameter("comp_ts");
+	 				String fid = request.getParameter("fid");
+	 				java.util.Date utilDate = new java.util.Date();
+	 				utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(comp_ts);
+	 				java.sql.Timestamp sq = new java.sql.Timestamp(utilDate.getTime());
+	 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 				java.sql.Timestamp ts = java.sql.Timestamp.valueOf(sdf.format(sq));
+	 				dbHandler.assignProject(taskid, fid, ts);
+	 				RequestDispatcher rd = request.getRequestDispatcher("UserHome.jsp");
+			        rd.include(request,response);
+ 				}
+ 				catch(Exception e){
+					System.out.println(e);
+ 				}
+ 			}
+ 			else{
+ 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
+		        rd.include(request,response);
+ 			}
+		}
 	}
 }

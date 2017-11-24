@@ -167,9 +167,9 @@
 				   			output += "</td><td>";
 				   			output += json.comp_ts;
 				   			output += "</td><td>";
-				   			output += "<button type = \"button\" id = \"completed_"+json.taskid+"\""
-				   			output += " onclick=\"if (confirm('Is "+json.subject+" really completed?')){markAsCompleted(this, '"+json.taskid+"')}\">Mark as Completed</button></th>"
-				   			output += "</td></tr>"
+				   			output += "<button type = \"button\" id = \"completed_"+json.taskid+"\"";
+				   			output += " onclick=\"if (confirm('Is "+json.subject+" really completed?')){markAsCompleted(this, '"+json.taskid+"')}\">Mark as Completed</button></th>";
+				   			output += "</td></tr>";
 					   		console.log(output);
 				    	}
 				   		output += "</table>";
@@ -200,6 +200,66 @@
 					    },
 					    success : function(data) {
 						    document.getElementById("pendingProjectsTable").deleteRow(i);
+						}
+					});
+				});
+			}
+		</script>
+		
+		<script>
+			function getNewlyAssignedProjects(){
+				$.ajax({
+					url : "HomeRelated",
+				    dataType : 'html',
+					type: "POST",
+					data: {
+						getNewlyAssignedProjects: "getNewlyAssignedProjects"
+					},
+				    success : function(result) {
+				    	document.title = "Your Newly Assigned Projects";
+				    	var json_obj = $.parseJSON(result);
+				    	var output = "<h1><strong> Here are your newly Assigned tasks: </strong></h1> <br>";
+				    	output += "<table id=\"getNewlyAssignedProjectsTable\"> <tr> <th>Subject</th><th>Proposed Completion Time</th><th>Start Working?</th> </tr>";
+				   		for(i=0; i<json_obj.length; i++){
+				   			var json = json_obj[i];
+				   			output += "<tr><td>";
+				   			output += json.subject;
+				   			output += "</td><td>";
+				   			output += json.comp_ts;
+				   			output += "</td><td>";
+				   			output += "<button type = \"button\" id = \"completed_"+json.taskid+"\"";
+				   			output += " onclick=\"if (confirm('Do you really want to start working on "+json.subject+"?')){markAsWorking(this, '"+json.taskid+"')}\">Start Working</button></th>";
+				   			output += "</td></tr>";
+					   		console.log(output);
+				    	}
+				   		output += "</table>";
+				   		console.log(output);
+						$("#home").html(output);
+					},
+				    error : function() {
+				    	alert("Error Occured");
+				    },
+				});	
+			}
+		</script>
+		
+		<script>
+			function markAsWorking(r, taskid) {
+				$(document).ready(function(){
+				    var i = r.parentNode.parentNode.rowIndex;
+				    $.ajax({
+						url : "HomeRelated",
+					    dataType : 'html',
+						type: "POST",
+						data: {
+							markAsWorking: "markAsWorking",
+							taskid: taskid
+						},
+					    error : function() {
+					    	alert("Error Occured");
+					    },
+					    success : function(data) {
+						    document.getElementById("getNewlyAssignedProjectsTable").deleteRow(i);
 						}
 					});
 				});
@@ -371,6 +431,7 @@
 		 <div class="topnav" id="myTopnav">
 		  <a href="#bid" onclick="getInterestingProjects()">Bid</a>
 		  <a href="#pendingTasks" onclick="getPendingProjects()">Pending Tasks</a>
+		  <a href="#newlyAssignedTasks" onclick="getNewlyAssignedProjects()">Newly Assigned Tasks</a>
 		  <a href="#completedTasks" onclick="getCompletedProjects()">Completed Tasks</a>
 		  <a href="#ongoingBids" onclick="getOngoingBids()">Ongoing Bids</a>
 		  <a href="#updateSkills" onclick="updateSkills()">Update Skills</a>

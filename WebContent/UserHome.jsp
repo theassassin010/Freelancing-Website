@@ -122,10 +122,15 @@
 				   			output += "</td><td>";
 				   			output += bid.post_ts;
 				   			output += "</td><td>";
-				   			output += bid.post_ts;
+				   			output += bid.bidcount;
 				   			output += "</td><td>";
-				   			output += "<button type=\"button\" onclick=\"getAllBidsOnTask("+bid.taskid+")\" >Details</button>";
-							output += "</td></tr>";
+				   			output += "<form action=\"BidRelated\" method=\"post\">";
+				   			output += "<input type = \"submit\" value = \"Details\" name=\"getAllBidsOnTask\">";
+				   			output += "<input type=\"hidden\" value=\""+bid.taskid+"\" name=\"taskid\" />";
+				   			output += "<input type=\"hidden\" value=\""+bid.subject+"\" name=\"subject\" />";
+				   			output += "<input type=\"hidden\" value=\""+bid.text+"\" name=\"text\" />";
+				   			output += "<input type=\"hidden\" value=\""+bid.post_ts+"\" name=\"post_ts\" />";
+				   			output += "</form> </td></tr>";
 				   			console.log(output);
 				   		}
 				   		output += "</table>";
@@ -137,6 +142,44 @@
 				});	
 			}
 		</script>
+				
+		<script>
+		function getOngoingProjects(){
+			$.ajax({
+				url : "HomeRelated",
+			    dataType : 'html',
+				type: "POST",
+				data: {
+					getOngoingProjects: "getOngoingProjects"
+				},
+			    success : function(result) {
+			    	document.title = "Welcome, Look at your alloted projects";
+			    	var json_obj = $.parseJSON(result);
+			    	var output = "<h1><strong>Projects:~ Work in Progress</strong></h1> <br>";
+			    	output += "<table><tr><th>S. No.</th><th>Subject</th><th>Freelancer</th><th>To be completed by</th> </tr>";
+			   		for(i=0; i<json_obj.length; i++){
+			   			var json = json_obj[i];
+			   			output += "<tr><td>";
+			   			output += String(i+1);
+			   			output += "</td><td>";
+			   			output += json.subject;
+			   			output += "</td><td>";
+			   			output += json.fname;
+			   			output += "</td><td>";
+			   			output += json.comp_ts;
+			   			output += "</td></tr>";
+				   		console.log(output);
+			    	}
+			   		output += "</table>"
+			   		console.log(output);
+					$("#content").html(output);
+				},
+			    error : function() {
+			    	alert("Error Occured");
+			    },
+			});	
+		}
+		</script>
 		
 		<script>
 			getBidSummary();
@@ -145,9 +188,9 @@
 	</head>
 	<body>
 		<div class="topnav" id="myTopnav">
-		  <a href="#home">Home</a>
-		  <a href="#postTask">Post Task</a>
-		  <a href="#contact">Contact</a>
+		  <a href="#home" onclick="getBidSummary()">Home</a>
+		  <a href="#postTask" onclick="document.location.href='PostTask.jsp';">Post Task</a>
+		  <a href="#ongoingTasks" onclick="getOngoingProjects()">Ongoing Tasks</a>
 		  <a href="#logout">Logout</a>
 		  <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
 		</div>
